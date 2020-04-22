@@ -12,6 +12,7 @@ enum my_keycodes {
 	MY_EQL_PLUS,
 	MY_MIN_USCRE,
 	MY_TILD_BSLS,
+	MY_QUOT_DQUOT,
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -34,7 +35,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [JIS] = LAYOUT(
         KC_ESC, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, MY_MIN_USCRE, MY_EQL_PLUS, KC_JYEN, MY_TILD_BSLS,
         KC_TAB, KC_Q, KC_W, KC_E, KC_R, KC_T, KC_Y, KC_U, KC_I, KC_O, KC_P, KC_RBRC, KC_BSLS, KC_BSPC,
-        MY_CONTROL, KC_A, KC_S, KC_D, KC_F, KC_G, KC_H, KC_J, KC_K, KC_L, KC_SCLN, LSFT(KC_7), KC_ENT,
+        MY_CONTROL, KC_A, KC_S, KC_D, KC_F, KC_G, KC_H, KC_J, KC_K, KC_L, KC_SCLN, MY_QUOT_DQUOT, KC_ENT,
         MY_SHIFT, KC_Z, KC_X, KC_C, KC_V, KC_B, KC_N, KC_M, KC_COMM, KC_DOT, KC_SLSH, MY_SHIFT, MO(HHKB),
         KC_ZKHK, KC_LALT, /*        */ KC_SPC, KC_RALT, KC_LGUI),
 
@@ -83,23 +84,25 @@ static struct {
 	bool shift;
 	bool enabled;
 } JIS_KEYCODE_MAP[] = {
-	{false, MY_EQL_PLUS , KC_MINS, true , false}, /* = */
-	{false, MY_MIN_USCRE, KC_MINS, false, false}, /* - */
-	{false, MY_TILD_BSLS, KC_LBRC, true , false}, /* ~ */
+	{false, MY_EQL_PLUS  , KC_MINS, true , false}, /* = */
+	{false, MY_MIN_USCRE , KC_MINS, false, false}, /* - */
+	{false, MY_TILD_BSLS , KC_LBRC, true , false}, /* ~ */
+	{false, MY_QUOT_DQUOT, KC_7   , true , false}, /* ' */
 	
-	{true , MY_EQL_PLUS , KC_SCLN, true , false}, /* + */
-	{true , MY_MIN_USCRE, KC_RO  , true , false}, /* _ */
-	{true , MY_TILD_BSLS, KC_EQL , true , false}, /* \ */
-	{true , KC_2        , KC_LBRC, false, false}, /* @ */
-	{true , KC_6        , KC_EQL , false, false}, /* ^ */
-	{true , KC_7        , KC_6   , true , false}, /* & */
-	{true , KC_8        , KC_QUOT, true , false}, /* * */
-	{true , KC_9        , KC_8   , true , false}, /* ( */
-	{true , KC_0        , KC_9   , true , false}, /* ) */	
-	{true , KC_LBRC     , KC_EQL , true , false}, /* ~ */
-	{true , KC_RBRC     , KC_RBRC, true , false}, /* { */
-	{true , KC_BSLS     , KC_BSLS, true , false}, /* } */
-	{true , KC_SCLN     , KC_QUOT, false, false}, /* : */
+	{true , MY_EQL_PLUS  , KC_SCLN, true , false}, /* + */
+	{true , MY_MIN_USCRE , KC_RO  , true , false}, /* _ */
+	{true , MY_TILD_BSLS , KC_EQL , true , false}, /* \ */
+	{true , MY_QUOT_DQUOT, KC_2   , true , false}, /* : */
+	{true , KC_2         , KC_LBRC, false, false}, /* @ */
+	{true , KC_6         , KC_EQL , false, false}, /* ^ */
+	{true , KC_7         , KC_6   , true , false}, /* & */
+	{true , KC_8         , KC_QUOT, true , false}, /* * */
+	{true , KC_9         , KC_8   , true , false}, /* ( */
+	{true , KC_0         , KC_9   , true , false}, /* ) */
+	{true , KC_LBRC      , KC_EQL , true , false}, /* ~ */
+	{true , KC_RBRC      , KC_RBRC, true , false}, /* { */
+	{true , KC_BSLS      , KC_BSLS, true , false}, /* } */
+	{true , KC_SCLN      , KC_QUOT, false, false}, /* : */
 };
 
 static void fetch_mods_status(void)
@@ -203,6 +206,7 @@ static uint16_t get_control_custom_key(uint16_t keycode)
 	case KC_K: return KC_UP;
 	case KC_H: return KC_LEFT;
 	case KC_L: return KC_RIGHT;
+	case KC_M: return KC_ENT;
 	}
 	
 	return KC_NO;
