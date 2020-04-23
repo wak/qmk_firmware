@@ -363,15 +363,18 @@ static void reset_my_shift_mods(void)
 static bool process_jis_key(uint16_t keycode, keyrecord_t *record)
 {
 	if (record->event.pressed) {
-		if (register_jis_key(keycode))
+		if (register_jis_key(keycode)) {
 			return false;
-		else
+		} else {
+			reset_my_shift_mods();
 			return true;
+		}
 	} else {
 		if (unregister_jis_key(keycode)) {
 			reset_my_shift_mods();
 			return false;
 		} else {
+			reset_my_shift_mods();
 			return true;
 		}
 	}
