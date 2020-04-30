@@ -156,10 +156,13 @@ static void reset_my_control_mods(void)
 		unregister_control_mods();
 }
 
-static void register_shift_mods(void)
+static bool register_shift_mods(void)
 {
-	if (!(get_mods() & MOD_MASK_SHIFT))
+	if (!(get_mods() & MOD_MASK_SHIFT)) {
 		register_mods(MOD_BIT(KC_LSFT));
+		return true;
+	}
+	return false;
 }
 
 static uint16_t unregister_shift_mods(void)
@@ -294,10 +297,16 @@ static bool register_jis_key(uint16_t keycode)
 {
 	for (int i = 0; i < sizeof(JIS_KEYCODE_MAP) / sizeof(*JIS_KEYCODE_MAP); i++) {
 		if (JIS_KEYCODE_MAP[i].from == keycode && JIS_KEYCODE_MAP[i].with_my_shift == my_shift) {
-			if (JIS_KEYCODE_MAP[i].shift)
-				register_shift_mods();
-			else
+			if (JIS_KEYCODE_MAP[i].shift) {
+				/*
+				 * PCが重い状態だと、Shiftのすぐあとにキー入力をすると、Shiftキー入力が判定されない。
+				 * waitが入力の妨げにならない程度に待つ。
+				 */
+				if (register_shift_mods())
+					wait_ms(80);
+			} else {
 				unregister_shift_mods();
+			}
 			register_code(JIS_KEYCODE_MAP[i].to);
 			JIS_KEYCODE_MAP[i].enabled = true;
 			return true;
