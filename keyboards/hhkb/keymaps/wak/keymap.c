@@ -76,6 +76,7 @@ static bool my_control;
 static bool my_shift;
 
 static bool custom_key_mode = false;
+static bool custom_key_processing = false;
 
 static struct {
 	bool with_my_shift;
@@ -177,7 +178,6 @@ static uint16_t unregister_shift_mods(void)
 	return ret;
 }
 
-
 static bool process_my_control(uint16_t keycode, keyrecord_t *record)
 {
 	if (keycode != MY_CONTROL)
@@ -185,13 +185,17 @@ static bool process_my_control(uint16_t keycode, keyrecord_t *record)
 
 	my_control = record->event.pressed;
 
-	if (my_control) {
+	if (record->event.pressed) {
 		reset_my_control_mods();
 	} else {
 		/* 例えば、Ctrl+k を押している状態でCtrlを離した場合、
 		 * 通常のキーボードの場合はkが入力される。
 		 * その挙動をさせるのは手間がかかるため、問答無用でキー入力を解除する。*/
-		clear_keyboard();
+		if (custom_key_processing)
+			clear_keyboard();
+		else
+			unregister_control_mods();
+		custom_key_processing = false;
 	}
 
 	return false;
@@ -248,6 +252,8 @@ static bool handle_show_custom_key_mode(uint16_t keycode, keyrecord_t *record)
 
 static bool process_control_custom_key(uint16_t keycode, keyrecord_t *record)
 {
+	custom_key_processing = false;
+
 	if (handle_show_custom_key_mode(keycode, record))
 		return false;
 
@@ -266,6 +272,7 @@ static bool process_control_custom_key(uint16_t keycode, keyrecord_t *record)
 	
 	if (record->event.pressed) {
 		if (key != KC_NO && !my_shift && !alt && !gui) {
+			custom_key_processing = true;
 			unregister_control_mods();
 			register_code(key);
 			return false;
@@ -281,16 +288,19 @@ static bool process_control_custom_key(uint16_t keycode, keyrecord_t *record)
 				register_mods(tmp);
 			return false;
 		}
-		
+		/*
+		 * カスタム定義キー以外のキーが入力された場合、Ctrlの押下状態を物理キーと合わせる。
+		 * Ctrl+j を入力中に q を入力した場合は、DOWN→Ctrl+q の流れになる。
+		 */
 		reset_my_control_mods();
+		return true;
 	} else {
 		if (key != KC_NO && !my_shift && !alt && !gui) {
 			unregister_code(key);
 			return false;
 		}
+		return true;
 	}
-
-	return true;
 }
 
 static bool register_jis_key(uint16_t keycode)
