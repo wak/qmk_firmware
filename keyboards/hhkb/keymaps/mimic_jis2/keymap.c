@@ -269,6 +269,11 @@ static struct translation *find_translation_key(uint16_t keycode)
 			 (trans->from_control == KS_OFF && my_control)))
 			continue;
 
+		if (trans->from_alt != KS_NONE &&
+			((trans->from_alt == KS_ON && !mod_alt) ||
+			 (trans->from_alt == KS_OFF && mod_alt)))
+			continue;
+
 		return trans;
 	}
 
