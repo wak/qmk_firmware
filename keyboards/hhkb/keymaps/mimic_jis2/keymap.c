@@ -250,6 +250,11 @@ static struct translation *find_translation_key(uint16_t keycode)
 {
 	struct translation *trans;
 
+	if (!my_shift && !my_control && !mod_alt) {
+		if (KC_A <= keycode && keycode <= KC_0)
+			return NULL;
+	}
+
 	for (int i = 0; i < sizeof(TRANSLATION_MAP) / sizeof(*TRANSLATION_MAP); i++) {
 		trans = &TRANSLATION_MAP[i];
 
