@@ -301,8 +301,8 @@ static struct translation TRANSLATION_MAP[] = {
 	{KS_ON, KS_ON, KS_OFF, KC_H, KS_NONE, KS_NONE, KS_NONE, KC_NO, NULL, cb_win_vdesktop}, /* C-A-h */
 
 	/* Keep screen key */
-	{KS_NONE, KS_NONE, KS_NONE, MY_KEEP_SCREEEN_MESSAGE, KC_NO, KS_NONE, KS_NONE, KS_NONE, NULL, cb_toggle_keep_screen_message},
-	{KS_NONE, KS_NONE, KS_NONE, MY_KEEP_SCREEEN_CTRL, KC_NO, KS_NONE, KS_NONE, KS_NONE, NULL, cb_toggle_keep_screen_ctrl},
+	{KS_NONE, KS_NONE, KS_NONE, MY_KEEP_SCREEEN_MESSAGE, KS_NONE, KS_NONE, KS_NONE, KC_NO, NULL, cb_toggle_keep_screen_message},
+	{KS_NONE, KS_NONE, KS_NONE, MY_KEEP_SCREEEN_CTRL   , KS_NONE, KS_NONE, KS_NONE, KC_NO, NULL, cb_toggle_keep_screen_ctrl},
 };
 
 static struct translation *translating = NULL;
