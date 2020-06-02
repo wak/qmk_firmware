@@ -16,8 +16,7 @@ enum my_keycodes {
 	MY_MIN_USCRE,
 	MY_TILD_BQUOT,
 	MY_QUOT_DQUOT,
-	MY_KEEP_SCREEEN_MESSAGE,
-	MY_KEEP_SCREEEN_CTRL,
+	MY_KEEP_SCREEEN,
 	MY_TOGGLE_OS,
 };
 
@@ -72,9 +71,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 	/* Fnキーを押している状態のレイアウト */
     [HHKB] = LAYOUT(
-        MY_KEEP_SCREEEN_MESSAGE, KC_F1, KC_F2, KC_F3, KC_F4, KC_F5, KC_F6, KC_F7, KC_F8, KC_F9, KC_F10, KC_F11, KC_F12, KC_INS, KC_DEL,
+        MY_KEEP_SCREEEN, KC_F1, KC_F2, KC_F3, KC_F4, KC_F5, KC_F6, KC_F7, KC_F8, KC_F9, KC_F10, KC_F11, KC_F12, KC_INS, KC_DEL,
         KC_CAPS, KC_TRNS, KC_BSPC, KC_END , KC_DEL , KC_TRNS, KC_TRNS, KC_TRNS, KC_PSCR, KC_SLCK, KC_PAUS, KC_UP, KC_TRNS, KC_BSPC,
-        MY_KEEP_SCREEEN_CTRL, KC_HOME, KC_LEFT, KC_UP  , KC_DOWN, KC_RGHT, KC_PAST, KC_PSLS, KC_HOME, KC_PGUP, KC_LEFT, KC_RGHT, KC_PENT,
+        KC_TRNS, KC_HOME, KC_LEFT, KC_UP  , KC_DOWN, KC_RGHT, KC_PAST, KC_PSLS, KC_HOME, KC_PGUP, KC_LEFT, KC_RGHT, KC_PENT,
         KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_PPLS, KC_PMNS, KC_END, KC_PGDN, KC_DOWN, KC_TRNS, KC_TRNS,
         MY_TOGGLE_OS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS),
 
@@ -332,9 +331,9 @@ static struct translation TRANSLATION_MAP[] = {
 	{ KS_ON , KS_ON , KS_OFF, KC_H, /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_win_vdesktop }, /* C-A-h */
 
 	/* Keep screen key */
-	/* CTL    ALT     SHIFT   KEYCODE                           CTL     ALT     SHIFT   KEY    FLAG  CALLBACK */
-	{ KS____, KS____, KS____, MY_KEEP_SCREEEN_MESSAGE, /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_toggle_keep_screen_message },
-	{ KS____, KS____, KS____, MY_KEEP_SCREEEN_CTRL   , /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_toggle_keep_screen_ctrl },
+	/* CTL    ALT     SHIFT   KEYCODE                   CTL     ALT     SHIFT   KEY    FLAG  CALLBACK */
+	{ KS_OFF, KS_OFF, KS_OFF, MY_KEEP_SCREEEN, /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_toggle_keep_screen_message },
+	{ KS_ON , KS_OFF, KS_OFF, MY_KEEP_SCREEEN, /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_toggle_keep_screen_ctrl },
 
 	/* Toggle OS */
 	/* CTL    ALT     SHIFT   KEYCODE                CTL     ALT     SHIFT   KEY    FLAG  CALLBACK */
