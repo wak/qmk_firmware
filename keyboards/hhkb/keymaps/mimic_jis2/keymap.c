@@ -6,7 +6,8 @@
 #include "timer.h"
 
 #define JIS    0
-#define HHKB   1
+#define MAC    1
+#define HHKB   2
 
 enum my_keycodes {
 	MY_CONTROL = SAFE_RANGE,
@@ -17,6 +18,7 @@ enum my_keycodes {
 	MY_QUOT_DQUOT,
 	MY_KEEP_SCREEEN_MESSAGE,
 	MY_KEEP_SCREEEN_CTRL,
+	MY_TOGGLE_OS,
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -43,6 +45,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         MY_SHIFT, KC_Z, KC_X, KC_C, KC_V, KC_B, KC_N, KC_M, KC_COMM, KC_DOT, KC_SLSH, MY_SHIFT, MO(HHKB),
         KC_ZKHK, KC_LALT, /*        */ KC_SPC, KC_RALT, KC_LGUI),
 
+    [MAC] = LAYOUT(
+        KC_ESC, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, MY_MIN_USCRE, MY_EQL_PLUS, KC_JYEN, MY_TILD_BQUOT,
+        KC_TAB, KC_Q, KC_W, KC_E, KC_R, KC_T, KC_Y, KC_U, KC_I, KC_O, KC_P, JP_LBRC, JP_RBRC, KC_BSPC,
+        MY_CONTROL, KC_A, KC_S, KC_D, KC_F, KC_G, KC_H, KC_J, KC_K, KC_L, KC_SCLN, MY_QUOT_DQUOT, KC_ENT,
+        MY_SHIFT, KC_Z, KC_X, KC_C, KC_V, KC_B, KC_N, KC_M, KC_COMM, KC_DOT, KC_SLSH, MY_SHIFT, MO(HHKB),
+        KC_ZKHK, KC_LGUI, /*        */ KC_SPC, KC_RGUI, KC_RALT),
+
 
     /* Layer HHKB: HHKB mode (HHKB Fn)
       |------+-----+-----+-----+----+----+----+----+-----+-----+-----+-----+-------+-------+-----|
@@ -67,7 +76,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_CAPS, KC_TRNS, KC_BSPC, KC_END , KC_DEL , KC_TRNS, KC_TRNS, KC_TRNS, KC_PSCR, KC_SLCK, KC_PAUS, KC_UP, KC_TRNS, KC_BSPC,
         MY_KEEP_SCREEEN_CTRL, KC_HOME, KC_LEFT, KC_UP  , KC_DOWN, KC_RGHT, KC_PAST, KC_PSLS, KC_HOME, KC_PGUP, KC_LEFT, KC_RGHT, KC_PENT,
         KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_PPLS, KC_PMNS, KC_END, KC_PGDN, KC_DOWN, KC_TRNS, KC_TRNS,
-        KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS),
+        MY_TOGGLE_OS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS),
 
 };
 
@@ -208,6 +217,14 @@ static void cb_win_vdesktop(struct translation *trans)
 		register_mods(tmp);
 }
 
+void cb_toggle_os(struct translation *trans)
+{
+	if (layer_state_is(JIS))
+		layer_move(MAC);
+	else
+		layer_move(JIS);
+}
+
 static enum {
 	KEEP_SCREEN_DISABLED,
 	KEEP_SCREEN_MESSAGE,
@@ -318,6 +335,10 @@ static struct translation TRANSLATION_MAP[] = {
 	/* CTL    ALT     SHIFT   KEYCODE                           CTL     ALT     SHIFT   KEY    FLAG  CALLBACK */
 	{ KS____, KS____, KS____, MY_KEEP_SCREEEN_MESSAGE, /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_toggle_keep_screen_message },
 	{ KS____, KS____, KS____, MY_KEEP_SCREEEN_CTRL   , /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_toggle_keep_screen_ctrl },
+
+	/* Toggle OS */
+	/* CTL    ALT     SHIFT   KEYCODE                CTL     ALT     SHIFT   KEY    FLAG  CALLBACK */
+	{ KS____, KS____, KS____, MY_TOGGLE_OS, /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_toggle_os },
 };
 #undef KS____
 
