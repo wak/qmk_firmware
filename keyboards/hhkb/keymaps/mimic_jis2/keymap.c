@@ -218,10 +218,14 @@ static void cb_win_vdesktop(struct translation *trans)
 
 void cb_toggle_os(struct translation *trans)
 {
-	if (layer_state_is(JIS))
+	static bool jis = true;
+
+	if (jis)
 		layer_move(MAC);
 	else
 		layer_move(JIS);
+
+	jis = !jis;
 }
 
 static enum {
