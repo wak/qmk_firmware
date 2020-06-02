@@ -3,7 +3,7 @@
  */
 #include QMK_KEYBOARD_H
 #include "keymap_jp.h"
-
+#include "timer.h"
 
 #define JIS    0
 #define HHKB   1
@@ -15,6 +15,8 @@ enum my_keycodes {
 	MY_MIN_USCRE,
 	MY_TILD_BQUOT,
 	MY_QUOT_DQUOT,
+	MY_KEEP_SCREEEN_MESSAGE,
+	MY_KEEP_SCREEEN_CTRL,
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -61,9 +63,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 	/* Fnキーを押している状態のレイアウト */
     [HHKB] = LAYOUT(
-        KC_PWR, KC_F1, KC_F2, KC_F3, KC_F4, KC_F5, KC_F6, KC_F7, KC_F8, KC_F9, KC_F10, KC_F11, KC_F12, KC_INS, KC_DEL,
+        MY_KEEP_SCREEEN_MESSAGE, KC_F1, KC_F2, KC_F3, KC_F4, KC_F5, KC_F6, KC_F7, KC_F8, KC_F9, KC_F10, KC_F11, KC_F12, KC_INS, KC_DEL,
         KC_CAPS, KC_TRNS, KC_BSPC, KC_END , KC_DEL , KC_TRNS, KC_TRNS, KC_TRNS, KC_PSCR, KC_SLCK, KC_PAUS, KC_UP, KC_TRNS, KC_BSPC,
-        KC_TRNS, KC_HOME, KC_LEFT, KC_UP  , KC_DOWN, KC_RGHT, KC_PAST, KC_PSLS, KC_HOME, KC_PGUP, KC_LEFT, KC_RGHT, KC_PENT,
+        MY_KEEP_SCREEEN_CTRL, KC_HOME, KC_LEFT, KC_UP  , KC_DOWN, KC_RGHT, KC_PAST, KC_PSLS, KC_HOME, KC_PGUP, KC_LEFT, KC_RGHT, KC_PENT,
         KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_PPLS, KC_PMNS, KC_END, KC_PGDN, KC_DOWN, KC_TRNS, KC_TRNS,
         KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS),
 
@@ -206,6 +208,61 @@ static void cb_win_vdesktop(struct translation *trans)
 		register_mods(tmp);
 }
 
+static enum {
+	KEEP_SCREEN_DISABLED,
+	KEEP_SCREEN_MESSAGE,
+	KEEP_SCREEN_CONTROL
+} keep_screen_mode = KEEP_SCREEN_DISABLED;
+static const char keep_screen_message[] = "This message is keeping screen.";
+static int keep_screen_pos = 0;
+
+void cb_toggle_keep_screen_message(struct translation *trans)
+{
+	if (keep_screen_mode) {
+		keep_screen_mode = KEEP_SCREEN_DISABLED;
+		return;
+	}
+	keep_screen_mode = KEEP_SCREEN_MESSAGE;
+	keep_screen_pos = 0;
+}
+
+void cb_toggle_keep_screen_ctrl(struct translation *trans)
+{
+	if (keep_screen_mode) {
+		keep_screen_mode = KEEP_SCREEN_DISABLED;
+		return;
+	}
+	keep_screen_mode = KEEP_SCREEN_CONTROL;
+	keep_screen_pos = 0;
+}
+
+void matrix_scan_user(void)
+{
+	static uint16_t keep_screen_timer = 0;
+
+	if (!keep_screen_mode)
+		return;
+
+	uint16_t e = timer_elapsed(keep_screen_timer);
+
+	if (e > 5 * 1000) {
+		/* Every 20 second */
+		keep_screen_timer += e/1000*1000;
+
+		if (keep_screen_mode == KEEP_SCREEN_MESSAGE) {
+			send_char(keep_screen_message[keep_screen_pos]);
+			if (keep_screen_message[keep_screen_pos + 1] == '\0')
+				keep_screen_pos = 0;
+			else
+				keep_screen_pos += 1;
+		} else {
+			register_control_mods();
+			wait_ms(500);
+			unregister_control_mods();
+		}
+	}
+}
+
 static struct translation TRANSLATION_MAP[] = {
 	/* US -> JIS translation map */
 	{KS_NONE, KS_NONE, KS_OFF, MY_EQL_PLUS  , /* -> */ KS_NONE, KS_NONE, KS_ON , JP_MINS}, /* = */
@@ -242,6 +299,10 @@ static struct translation TRANSLATION_MAP[] = {
 	/* Shortcut key */
 	{KS_ON, KS_ON, KS_OFF, KC_L, KS_NONE, KS_NONE, KS_NONE, KC_NO, NULL, cb_win_vdesktop}, /* C-A-l */
 	{KS_ON, KS_ON, KS_OFF, KC_H, KS_NONE, KS_NONE, KS_NONE, KC_NO, NULL, cb_win_vdesktop}, /* C-A-h */
+
+	/* Keep screen key */
+	{KS_NONE, KS_NONE, KS_NONE, MY_KEEP_SCREEEN_MESSAGE, KC_NO, KS_NONE, KS_NONE, KS_NONE, NULL, cb_toggle_keep_screen_message},
+	{KS_NONE, KS_NONE, KS_NONE, MY_KEEP_SCREEEN_CTRL, KC_NO, KS_NONE, KS_NONE, KS_NONE, NULL, cb_toggle_keep_screen_ctrl},
 };
 
 static struct translation *translating = NULL;
