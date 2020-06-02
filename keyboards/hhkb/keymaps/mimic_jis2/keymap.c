@@ -163,7 +163,7 @@ static uint16_t unregister_alt_mods(void)
 }
 
 typedef enum {
-	KS_NONE = -1,
+	KS_TRANS = -1,
 	KS_OFF  = 0,
 	KS_ON   = 1,
 } KEY_STATUS;
@@ -263,47 +263,53 @@ void matrix_scan_user(void)
 	}
 }
 
+#define KS____ KS_TRANS
 static struct translation TRANSLATION_MAP[] = {
 	/* US -> JIS translation map */
-	{KS_NONE, KS_NONE, KS_OFF, MY_EQL_PLUS  , /* -> */ KS_NONE, KS_NONE, KS_ON , JP_MINS}, /* = */
-	{KS_NONE, KS_NONE, KS_ON , MY_EQL_PLUS  , /* -> */ KS_NONE, KS_NONE, KS_ON , JP_SCLN}, /* + */
-	{KS_NONE, KS_NONE, KS_OFF, MY_MIN_USCRE , /* -> */ KS_NONE, KS_NONE, KS_OFF, JP_MINS}, /* - */
-	{KS_NONE, KS_NONE, KS_ON , MY_MIN_USCRE , /* -> */ KS_NONE, KS_NONE, KS_ON , JP_BSLS}, /* _ */
-	{KS_NONE, KS_NONE, KS_OFF, MY_TILD_BQUOT, /* -> */ KS_NONE, KS_NONE, KS_ON , JP_AT  }, /* ` */
-	{KS_NONE, KS_NONE, KS_ON , MY_TILD_BQUOT, /* -> */ KS_NONE, KS_NONE, KS_ON , JP_CIRC}, /* ~ */
-	{KS_NONE, KS_NONE, KS_OFF, MY_QUOT_DQUOT, /* -> */ KS_NONE, KS_NONE, KS_ON , KC_7   }, /* ' */
-	{KS_NONE, KS_NONE, KS_ON , MY_QUOT_DQUOT, /* -> */ KS_NONE, KS_NONE, KS_ON , KC_2   }, /* ". */
-	{KS_NONE, KS_NONE, KS_ON , KC_2         , /* -> */ KS_NONE, KS_NONE, KS_OFF, JP_AT  }, /* @ */
-	{KS_NONE, KS_NONE, KS_ON , KC_6         , /* -> */ KS_NONE, KS_NONE, KS_OFF, JP_CIRC}, /* ^ */
-	{KS_NONE, KS_NONE, KS_ON , KC_7         , /* -> */ KS_NONE, KS_NONE, KS_ON , KC_6   }, /* & */
-	{KS_NONE, KS_NONE, KS_ON , KC_8         , /* -> */ KS_NONE, KS_NONE, KS_ON , JP_COLN}, /* * */
-	{KS_NONE, KS_NONE, KS_ON , KC_9         , /* -> */ KS_NONE, KS_NONE, KS_ON , KC_8   }, /* ( */
-	{KS_NONE, KS_NONE, KS_ON , KC_0         , /* -> */ KS_NONE, KS_NONE, KS_ON , KC_9   }, /* ) */
-	{KS_NONE, KS_NONE, KS_ON , KC_SCLN      , /* -> */ KS_NONE, KS_NONE, KS_OFF, JP_COLN}, /* : */
+	/* CTL    ALT     SHIFT   KEYCODE                 CTL     ALT     SHIFT   KEYCODE */
+	{ KS____, KS____, KS_OFF, MY_EQL_PLUS  , /* -> */ KS____, KS____, KS_ON , JP_MINS }, /* = */
+	{ KS____, KS____, KS_ON , MY_EQL_PLUS  , /* -> */ KS____, KS____, KS_ON , JP_SCLN }, /* + */
+	{ KS____, KS____, KS_OFF, MY_MIN_USCRE , /* -> */ KS____, KS____, KS_OFF, JP_MINS }, /* - */
+	{ KS____, KS____, KS_ON , MY_MIN_USCRE , /* -> */ KS____, KS____, KS_ON , JP_BSLS }, /* _ */
+	{ KS____, KS____, KS_OFF, MY_TILD_BQUOT, /* -> */ KS____, KS____, KS_ON , JP_AT   }, /* ` */
+	{ KS____, KS____, KS_ON , MY_TILD_BQUOT, /* -> */ KS____, KS____, KS_ON , JP_CIRC }, /* ~ */
+	{ KS____, KS____, KS_OFF, MY_QUOT_DQUOT, /* -> */ KS____, KS____, KS_ON , KC_7    }, /* ' */
+	{ KS____, KS____, KS_ON , MY_QUOT_DQUOT, /* -> */ KS____, KS____, KS_ON , KC_2    }, /* " */
+	{ KS____, KS____, KS_ON , KC_2         , /* -> */ KS____, KS____, KS_OFF, JP_AT   }, /* @ */
+	{ KS____, KS____, KS_ON , KC_6         , /* -> */ KS____, KS____, KS_OFF, JP_CIRC }, /* ^ */
+	{ KS____, KS____, KS_ON , KC_7         , /* -> */ KS____, KS____, KS_ON , KC_6    }, /* & */
+	{ KS____, KS____, KS_ON , KC_8         , /* -> */ KS____, KS____, KS_ON , JP_COLN }, /* * */
+	{ KS____, KS____, KS_ON , KC_9         , /* -> */ KS____, KS____, KS_ON , KC_8    }, /* ( */
+	{ KS____, KS____, KS_ON , KC_0         , /* -> */ KS____, KS____, KS_ON , KC_9    }, /* ) */
+	{ KS____, KS____, KS_ON , KC_SCLN      , /* -> */ KS____, KS____, KS_OFF, JP_COLN }, /* : */
 
 	/* Custom key */
-	{KS_ON, KS_NONE, KS_OFF , KC_ESC,          KS_NONE, KS_NONE, KS_NONE, KC_NO   , NULL, cb_toggle_custom_key_mode}, /* C-ESC */
-	{KS_ON, KS_NONE, KS_ON  , KC_ESC,          KS_NONE, KS_NONE, KS_NONE, KC_NO   , NULL, cb_show_custom_key_mode},   /* C-S-ESC */
-	{KS_ON, KS_NONE, KS_ON  , KC_A  , /* -> */ KS_ON  , KS_NONE, KS_OFF , KC_A    , &flg_control_custom_key_enabled}, /* C-S-a => C-a       */
-	{KS_ON, KS_NONE, KS_NONE, KC_A  , /* -> */ KS_OFF , KS_NONE, KS_NONE, KC_HOME , &flg_control_custom_key_enabled}, /* C-a   -> HOME      */
-	{KS_ON, KS_NONE, KS_NONE, KC_E  , /* -> */ KS_OFF , KS_NONE, KS_NONE, KC_END  , &flg_control_custom_key_enabled}, /* C-e   -> END       */
-	{KS_ON, KS_NONE, KS_NONE, KC_D  , /* -> */ KS_OFF , KS_NONE, KS_NONE, KC_DEL  , &flg_control_custom_key_enabled}, /* C-d   -> Delete    */
-	{KS_ON, KS_NONE, KS_NONE, KC_U  , /* -> */ KS_OFF , KS_NONE, KS_NONE, KC_BSPC , &flg_control_custom_key_enabled}, /* C-u   -> Backspace */
-	{KS_ON, KS_NONE, KS_NONE, KC_O  , /* -> */ KS_OFF , KS_NONE, KS_NONE, KC_DEL  , &flg_control_custom_key_enabled}, /* C-o   -> Delete    */
-	{KS_ON, KS_NONE, KS_NONE, KC_J  , /* -> */ KS_OFF , KS_NONE, KS_NONE, KC_DOWN , &flg_control_custom_key_enabled}, /* C-j   -> Down      */
-	{KS_ON, KS_NONE, KS_NONE, KC_K  , /* -> */ KS_OFF , KS_NONE, KS_NONE, KC_UP   , &flg_control_custom_key_enabled}, /* C-k   -> Up        */
-	{KS_ON, KS_NONE, KS_NONE, KC_H  , /* -> */ KS_OFF , KS_NONE, KS_NONE, KC_LEFT , &flg_control_custom_key_enabled}, /* C-h   -> Left      */
-	{KS_ON, KS_NONE, KS_NONE, KC_L  , /* -> */ KS_OFF , KS_NONE, KS_NONE, KC_RIGHT, &flg_control_custom_key_enabled}, /* C-l   -> Right     */
-	{KS_ON, KS_NONE, KS_NONE, KC_M  , /* -> */ KS_OFF , KS_NONE, KS_NONE, KC_ENT  , &flg_control_custom_key_enabled}, /* C-m   -> Enter     */
+	/* CTL    ALT     SHIFT   KEYCODE          CTL     ALT     SHIFT   KEYCODE   FLAG  CALLBACK */
+	{ KS_ON , KS____, KS_OFF, KC_ESC,          KS____, KS____, KS____, KC_NO   , NULL, cb_toggle_custom_key_mode }, /* C-ESC              */
+	{ KS_ON , KS____, KS_ON , KC_ESC,          KS____, KS____, KS____, KC_NO   , NULL, cb_show_custom_key_mode   }, /* C-S-ESC            */
+	{ KS_ON , KS____, KS_ON , KC_A  , /* -> */ KS_ON , KS____, KS_OFF, KC_A    , &flg_control_custom_key_enabled }, /* C-S-a => C-a       */
+	{ KS_ON , KS____, KS____, KC_A  , /* -> */ KS_OFF, KS____, KS____, KC_HOME , &flg_control_custom_key_enabled }, /* C-a   -> HOME      */
+	{ KS_ON , KS____, KS____, KC_E  , /* -> */ KS_OFF, KS____, KS____, KC_END  , &flg_control_custom_key_enabled }, /* C-e   -> END       */
+	{ KS_ON , KS____, KS____, KC_D  , /* -> */ KS_OFF, KS____, KS____, KC_DEL  , &flg_control_custom_key_enabled }, /* C-d   -> Delete    */
+	{ KS_ON , KS____, KS____, KC_U  , /* -> */ KS_OFF, KS____, KS____, KC_BSPC , &flg_control_custom_key_enabled }, /* C-u   -> Backspace */
+	{ KS_ON , KS____, KS____, KC_O  , /* -> */ KS_OFF, KS____, KS____, KC_DEL  , &flg_control_custom_key_enabled }, /* C-o   -> Delete    */
+	{ KS_ON , KS____, KS____, KC_J  , /* -> */ KS_OFF, KS____, KS____, KC_DOWN , &flg_control_custom_key_enabled }, /* C-j   -> Down      */
+	{ KS_ON , KS____, KS____, KC_K  , /* -> */ KS_OFF, KS____, KS____, KC_UP   , &flg_control_custom_key_enabled }, /* C-k   -> Up        */
+	{ KS_ON , KS____, KS____, KC_H  , /* -> */ KS_OFF, KS____, KS____, KC_LEFT , &flg_control_custom_key_enabled }, /* C-h   -> Left      */
+	{ KS_ON , KS____, KS____, KC_L  , /* -> */ KS_OFF, KS____, KS____, KC_RIGHT, &flg_control_custom_key_enabled }, /* C-l   -> Right     */
+	{ KS_ON , KS____, KS____, KC_M  , /* -> */ KS_OFF, KS____, KS____, KC_ENT  , &flg_control_custom_key_enabled }, /* C-m   -> Enter     */
 
 	/* Shortcut key */
-	{KS_ON, KS_ON, KS_OFF, KC_L, KS_NONE, KS_NONE, KS_NONE, KC_NO, NULL, cb_win_vdesktop}, /* C-A-l */
-	{KS_ON, KS_ON, KS_OFF, KC_H, KS_NONE, KS_NONE, KS_NONE, KC_NO, NULL, cb_win_vdesktop}, /* C-A-h */
+	/* CTL    ALT     SHIFT   KEY            CTL     ALT     SHIFT   KEY    FLAG  CALLBACK */
+	{ KS_ON , KS_ON , KS_OFF, KC_L, /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_win_vdesktop }, /* C-A-l */
+	{ KS_ON , KS_ON , KS_OFF, KC_H, /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_win_vdesktop }, /* C-A-h */
 
 	/* Keep screen key */
-	{KS_NONE, KS_NONE, KS_NONE, MY_KEEP_SCREEEN_MESSAGE, KS_NONE, KS_NONE, KS_NONE, KC_NO, NULL, cb_toggle_keep_screen_message},
-	{KS_NONE, KS_NONE, KS_NONE, MY_KEEP_SCREEEN_CTRL   , KS_NONE, KS_NONE, KS_NONE, KC_NO, NULL, cb_toggle_keep_screen_ctrl},
+	/* CTL    ALT     SHIFT   KEYCODE                           CTL     ALT     SHIFT   KEY    FLAG  CALLBACK */
+	{ KS____, KS____, KS____, MY_KEEP_SCREEEN_MESSAGE, /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_toggle_keep_screen_message },
+	{ KS____, KS____, KS____, MY_KEEP_SCREEEN_CTRL   , /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_toggle_keep_screen_ctrl },
 };
+#undef KS____
 
 static struct translation *translating = NULL;
 
@@ -325,17 +331,17 @@ static struct translation *find_translation_key(uint16_t keycode)
 		if (trans->flg_enabled != NULL && !*trans->flg_enabled)
 			continue;
 
-		if (trans->from_shift != KS_NONE &&
+		if (trans->from_shift != KS_TRANS &&
 			((trans->from_shift == KS_ON && !my_shift) ||
 			 (trans->from_shift == KS_OFF && my_shift)))
 			continue;
 
-		if (trans->from_control != KS_NONE &&
+		if (trans->from_control != KS_TRANS &&
 			((trans->from_control == KS_ON && !my_control) ||
 			 (trans->from_control == KS_OFF && my_control)))
 			continue;
 
-		if (trans->from_alt != KS_NONE &&
+		if (trans->from_alt != KS_TRANS &&
 			((trans->from_alt == KS_ON && !mod_alt) ||
 			 (trans->from_alt == KS_OFF && mod_alt)))
 			continue;
@@ -357,14 +363,14 @@ static void enable_translation_key(struct translation *trans)
 {
 	bool should_wait = false;
 
-	if (trans->to_shift != KS_NONE) {
+	if (trans->to_shift != KS_TRANS) {
 		if (trans->to_shift)
 			should_wait |= register_shift_mods();
 		else
 			should_wait |= unregister_shift_mods();
 	}
 
-	if (trans->to_control != KS_NONE) {
+	if (trans->to_control != KS_TRANS) {
 		if (trans->to_control)
 			should_wait |= register_control_mods();
 		else
