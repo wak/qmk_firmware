@@ -250,7 +250,17 @@ void matrix_scan_user(void)
 		keep_screen_timer += e/1000*1000;
 
 		if (keep_screen_mode == KEEP_SCREEN_MESSAGE) {
-			send_char(keep_screen_message[keep_screen_pos]);
+			char c = keep_screen_message[keep_screen_pos];
+			if (c == 'y' || c == 'Y' || c == 'n' || c == 'N') {
+				send_char('"');				 /* * */
+			} else if (c == ' ') {
+				register_shift_mods();
+				tap_code(JP_BSLS);			 /* _ */
+				unregister_shift_mods();
+			} else {
+				send_char(c);
+			}
+
 			if (keep_screen_message[keep_screen_pos + 1] == '\0')
 				keep_screen_pos = 0;
 			else
