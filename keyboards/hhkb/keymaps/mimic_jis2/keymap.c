@@ -238,22 +238,27 @@ static int keep_screen_pos = 0;
 
 void cb_toggle_keep_screen_message(struct translation *trans)
 {
-	if (keep_screen_mode) {
+	if (keep_screen_mode == KEEP_SCREEN_MESSAGE) {
 		keep_screen_mode = KEEP_SCREEN_DISABLED;
 		return;
 	}
 	keep_screen_mode = KEEP_SCREEN_MESSAGE;
 	keep_screen_pos = 0;
+	send_string("]KM\\");
 }
 
 void cb_toggle_keep_screen_ctrl(struct translation *trans)
 {
-	if (keep_screen_mode) {
+	if (keep_screen_mode == KEEP_SCREEN_CONTROL) {
 		keep_screen_mode = KEEP_SCREEN_DISABLED;
 		return;
 	}
 	keep_screen_mode = KEEP_SCREEN_CONTROL;
 	keep_screen_pos = 0;
+	unregister_control_mods();
+	wait_ms(80);
+	send_string("]KC\\");
+	reset_my_control_mods();
 }
 
 void matrix_scan_user(void)
