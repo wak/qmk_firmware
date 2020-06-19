@@ -446,19 +446,29 @@ static bool process_translation_key(uint16_t keycode, keyrecord_t *record)
 {
 	struct translation *trans = find_translation_key(keycode);
 
-	if (trans) {
+	if (trans == NULL) {
 		if (record->event.pressed) {
+			/* 変換とは関係のないキーが入力された場合、
+			 * 現在の変換を無効化して入力されたキーを有効にする。 */
+			reset_translation_key();
+			return true;
+		}
+	} else if (trans == translating) {
+		if (!record->event.pressed) {
+			reset_translation_key();
+		}
+	} else {
+		/* 過去に変換した可能性のあるキー処理 */
+
+		if (record->event.pressed) {
+			/* 変換の新規実施 or 変換の上書き */
 			do_translation_key(trans);
 			return false;
 		} else {
-			disable_translation_key(trans);
-		}
-	} else {
-		if (record->event.pressed) {
-			reset_translation_key();
+			/* CtrlやShiftのUpはここには来ない。
+			 * 変換とは関係ないキーが離された場合のため、デフォルトの動作に任せる。
+			 * 別の変換が実施中の可能性があるため、変換の無効化はおこなわない。 */
 			return true;
-		} else {
-			reset_translation_key();
 		}
 	}
 	return true;
