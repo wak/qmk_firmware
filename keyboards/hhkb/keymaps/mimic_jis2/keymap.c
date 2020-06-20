@@ -6,8 +6,8 @@
 #include "timer.h"
 
 #define JIS    0
-#define MAC    1
-#define HHKB   2
+#define US     2
+#define HHKB   3
 
 enum my_keycodes {
 	MY_CONTROL = SAFE_RANGE,
@@ -18,6 +18,11 @@ enum my_keycodes {
 	MY_QUOT_DQUOT,
 	MY_KEEP_SCREEEN,
 	MY_TOGGLE_OS,
+	MY_TOGGLE_LANG,
+	MY_ZENKAKU_HANKAKU,
+	MY_MOD_1,
+	MY_MOD_2,
+	MY_MOD_3,
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -42,14 +47,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_TAB, KC_Q, KC_W, KC_E, KC_R, KC_T, KC_Y, KC_U, KC_I, KC_O, KC_P, JP_LBRC, JP_RBRC, KC_BSPC,
         MY_CONTROL, KC_A, KC_S, KC_D, KC_F, KC_G, KC_H, KC_J, KC_K, KC_L, KC_SCLN, MY_QUOT_DQUOT, KC_ENT,
         MY_SHIFT, KC_Z, KC_X, KC_C, KC_V, KC_B, KC_N, KC_M, KC_COMM, KC_DOT, KC_SLSH, MY_SHIFT, MO(HHKB),
-        KC_ZKHK, KC_LALT, /*        */ KC_SPC, KC_RALT, KC_LGUI),
+        KC_ZKHK, MY_MOD_1, /*        */ KC_SPC, MY_MOD_2, MY_MOD_3),
 
-    [MAC] = LAYOUT(
-        KC_ESC, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, MY_MIN_USCRE, MY_EQL_PLUS, KC_JYEN, MY_TILD_BQUOT,
-        KC_TAB, KC_Q, KC_W, KC_E, KC_R, KC_T, KC_Y, KC_U, KC_I, KC_O, KC_P, JP_LBRC, JP_RBRC, KC_BSPC,
-        MY_CONTROL, KC_A, KC_S, KC_D, KC_F, KC_G, KC_H, KC_J, KC_K, KC_L, KC_SCLN, MY_QUOT_DQUOT, KC_ENT,
+    [US] = LAYOUT( //  default layer
+        KC_ESC, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, KC_MINS, KC_EQL, KC_BSLS, KC_GRV,
+        KC_TAB, KC_Q, KC_W, KC_E, KC_R, KC_T, KC_Y, KC_U, KC_I, KC_O, KC_P, KC_LBRC, KC_RBRC, KC_BSPC,
+        MY_CONTROL, KC_A, KC_S, KC_D, KC_F, KC_G, KC_H, KC_J, KC_K, KC_L, KC_SCLN, KC_QUOT, KC_ENT,
         MY_SHIFT, KC_Z, KC_X, KC_C, KC_V, KC_B, KC_N, KC_M, KC_COMM, KC_DOT, KC_SLSH, MY_SHIFT, MO(HHKB),
-        KC_ZKHK, KC_LGUI, /*        */ KC_SPC, KC_RGUI, KC_RALT),
+		MY_ZENKAKU_HANKAKU, MY_MOD_1, /*        */ KC_SPC, MY_MOD_2, MY_MOD_3),
 
 
     /* Layer HHKB: HHKB mode (HHKB Fn)
@@ -75,7 +80,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_CAPS, KC_TRNS, KC_BSPC, KC_END , KC_DEL , KC_TRNS, KC_TRNS, KC_TRNS, KC_PSCR, KC_SLCK, KC_PAUS, KC_UP, KC_TRNS, KC_BSPC,
         KC_TRNS, KC_HOME, KC_LEFT, KC_UP  , KC_DOWN, KC_RGHT, KC_PAST, KC_PSLS, KC_HOME, KC_PGUP, KC_LEFT, KC_RGHT, KC_PENT,
         KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_PPLS, KC_PMNS, KC_END, KC_PGDN, KC_DOWN, KC_TRNS, KC_TRNS,
-        MY_TOGGLE_OS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS),
+        MY_TOGGLE_LANG, MY_TOGGLE_OS, KC_TRNS, KC_TRNS, KC_TRNS),
 
 };
 
@@ -153,6 +158,16 @@ static void reset_my_shift_mods(void)
 		unregister_shift_mods();
 }
 
+static bool register_alt_mods(void)
+{
+	if (!(get_mods() & MOD_MASK_ALT)) {
+		register_mods(MOD_BIT(KC_LALT));
+		return true;
+	}
+
+	return false;
+}
+
 static uint16_t unregister_alt_mods(void)
 {
 	uint16_t ret = 0;
@@ -190,16 +205,24 @@ struct translation {
 };
 
 static bool flg_control_custom_key_enabled = false;
+static bool flg_os_windows = true;
+static bool flg_jis_mode = true;
 
 static void cb_toggle_custom_key_mode(struct translation *trans)
 {
 	flg_control_custom_key_enabled = !flg_control_custom_key_enabled;
 }
 
-static void cb_show_custom_key_mode(struct translation *trans)
+static void cb_show_mode(struct translation *trans)
 {
 	uint16_t tmp = unregister_control_mods();
-	send_string(flg_control_custom_key_enabled ? "C" : "D");
+	send_string("[");
+	send_string(flg_control_custom_key_enabled ? "Cust" : "Dft");
+	send_string(",");
+	send_string(flg_jis_mode ? "JIS" : "US");
+	send_string(",");
+	send_string(flg_os_windows ? "WIN" : "MAC");
+	send_string("]");
 	if (tmp)
 		register_mods(tmp);
 }
@@ -218,14 +241,17 @@ static void cb_win_vdesktop(struct translation *trans)
 
 void cb_toggle_os(struct translation *trans)
 {
-	static bool jis = true;
+	flg_os_windows = !flg_os_windows;
+}
 
-	if (jis)
-		layer_move(MAC);
-	else
+void cb_toggle_lang(struct translation *trans)
+{
+	flg_jis_mode = !flg_jis_mode;
+
+	if (flg_jis_mode)
 		layer_move(JIS);
-
-	jis = !jis;
+	else
+		layer_move(US);
 }
 
 static enum {
@@ -302,26 +328,26 @@ void matrix_scan_user(void)
 static struct translation TRANSLATION_MAP[] = {
 	/* US -> JIS translation map */
 	/* CTL    ALT     SHIFT   KEYCODE                 CTL     ALT     SHIFT   KEYCODE */
-	{ KS____, KS____, KS_OFF, MY_EQL_PLUS  , /* -> */ KS____, KS____, KS_ON , JP_MINS }, /* = */
-	{ KS____, KS____, KS_ON , MY_EQL_PLUS  , /* -> */ KS____, KS____, KS_ON , JP_SCLN }, /* + */
-	{ KS____, KS____, KS_OFF, MY_MIN_USCRE , /* -> */ KS____, KS____, KS_OFF, JP_MINS }, /* - */
-	{ KS____, KS____, KS_ON , MY_MIN_USCRE , /* -> */ KS____, KS____, KS_ON , JP_BSLS }, /* _ */
-	{ KS____, KS____, KS_OFF, MY_TILD_BQUOT, /* -> */ KS____, KS____, KS_ON , JP_AT   }, /* ` */
-	{ KS____, KS____, KS_ON , MY_TILD_BQUOT, /* -> */ KS____, KS____, KS_ON , JP_CIRC }, /* ~ */
-	{ KS____, KS____, KS_OFF, MY_QUOT_DQUOT, /* -> */ KS____, KS____, KS_ON , KC_7    }, /* ' */
-	{ KS____, KS____, KS_ON , MY_QUOT_DQUOT, /* -> */ KS____, KS____, KS_ON , KC_2    }, /* " */
-	{ KS____, KS____, KS_ON , KC_2         , /* -> */ KS____, KS____, KS_OFF, JP_AT   }, /* @ */
-	{ KS____, KS____, KS_ON , KC_6         , /* -> */ KS____, KS____, KS_OFF, JP_CIRC }, /* ^ */
-	{ KS____, KS____, KS_ON , KC_7         , /* -> */ KS____, KS____, KS_ON , KC_6    }, /* & */
-	{ KS____, KS____, KS_ON , KC_8         , /* -> */ KS____, KS____, KS_ON , JP_COLN }, /* * */
-	{ KS____, KS____, KS_ON , KC_9         , /* -> */ KS____, KS____, KS_ON , KC_8    }, /* ( */
-	{ KS____, KS____, KS_ON , KC_0         , /* -> */ KS____, KS____, KS_ON , KC_9    }, /* ) */
-	{ KS____, KS____, KS_ON , KC_SCLN      , /* -> */ KS____, KS____, KS_OFF, JP_COLN }, /* : */
+	{ KS____, KS____, KS_OFF, MY_EQL_PLUS  , /* -> */ KS____, KS____, KS_ON , JP_MINS, &flg_jis_mode }, /* = */
+	{ KS____, KS____, KS_ON , MY_EQL_PLUS  , /* -> */ KS____, KS____, KS_ON , JP_SCLN, &flg_jis_mode }, /* + */
+	{ KS____, KS____, KS_OFF, MY_MIN_USCRE , /* -> */ KS____, KS____, KS_OFF, JP_MINS, &flg_jis_mode }, /* - */
+	{ KS____, KS____, KS_ON , MY_MIN_USCRE , /* -> */ KS____, KS____, KS_ON , JP_BSLS, &flg_jis_mode }, /* _ */
+	{ KS____, KS____, KS_OFF, MY_TILD_BQUOT, /* -> */ KS____, KS____, KS_ON , JP_AT  , &flg_jis_mode }, /* ` */
+	{ KS____, KS____, KS_ON , MY_TILD_BQUOT, /* -> */ KS____, KS____, KS_ON , JP_CIRC, &flg_jis_mode }, /* ~ */
+	{ KS____, KS____, KS_OFF, MY_QUOT_DQUOT, /* -> */ KS____, KS____, KS_ON , KC_7   , &flg_jis_mode }, /* ' */
+	{ KS____, KS____, KS_ON , MY_QUOT_DQUOT, /* -> */ KS____, KS____, KS_ON , KC_2   , &flg_jis_mode }, /* " */
+	{ KS____, KS____, KS_ON , KC_2         , /* -> */ KS____, KS____, KS_OFF, JP_AT  , &flg_jis_mode }, /* @ */
+	{ KS____, KS____, KS_ON , KC_6         , /* -> */ KS____, KS____, KS_OFF, JP_CIRC, &flg_jis_mode }, /* ^ */
+	{ KS____, KS____, KS_ON , KC_7         , /* -> */ KS____, KS____, KS_ON , KC_6   , &flg_jis_mode }, /* & */
+	{ KS____, KS____, KS_ON , KC_8         , /* -> */ KS____, KS____, KS_ON , JP_COLN, &flg_jis_mode }, /* * */
+	{ KS____, KS____, KS_ON , KC_9         , /* -> */ KS____, KS____, KS_ON , KC_8   , &flg_jis_mode }, /* ( */
+	{ KS____, KS____, KS_ON , KC_0         , /* -> */ KS____, KS____, KS_ON , KC_9   , &flg_jis_mode }, /* ) */
+	{ KS____, KS____, KS_ON , KC_SCLN      , /* -> */ KS____, KS____, KS_OFF, JP_COLN, &flg_jis_mode }, /* : */
 
 	/* Custom key */
 	/* CTL    ALT     SHIFT   KEYCODE          CTL     ALT     SHIFT   KEYCODE   FLAG  CALLBACK */
 	{ KS_ON , KS____, KS_OFF, KC_ESC,          KS____, KS____, KS____, KC_NO   , NULL, cb_toggle_custom_key_mode }, /* C-ESC              */
-	{ KS_ON , KS____, KS_ON , KC_ESC,          KS____, KS____, KS____, KC_NO   , NULL, cb_show_custom_key_mode   }, /* C-S-ESC            */
+	{ KS_ON , KS____, KS_ON , KC_ESC,          KS____, KS____, KS____, KC_NO   , NULL, cb_show_mode              }, /* C-S-ESC            */
 	{ KS_ON , KS____, KS_ON , KC_A  , /* -> */ KS_ON , KS____, KS_OFF, KC_A    , &flg_control_custom_key_enabled }, /* C-S-a => C-a       */
 	{ KS_ON , KS____, KS____, KC_A  , /* -> */ KS_OFF, KS____, KS____, KC_HOME , &flg_control_custom_key_enabled }, /* C-a   -> HOME      */
 	{ KS_ON , KS____, KS____, KC_E  , /* -> */ KS_OFF, KS____, KS____, KC_END  , &flg_control_custom_key_enabled }, /* C-e   -> END       */
@@ -344,9 +370,10 @@ static struct translation TRANSLATION_MAP[] = {
 	{ KS_OFF, KS_OFF, KS_OFF, MY_KEEP_SCREEEN, /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_toggle_keep_screen_message },
 	{ KS_ON , KS_OFF, KS_OFF, MY_KEEP_SCREEEN, /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_toggle_keep_screen_ctrl },
 
-	/* Toggle OS */
-	/* CTL    ALT     SHIFT   KEYCODE                CTL     ALT     SHIFT   KEY    FLAG  CALLBACK */
-	{ KS____, KS____, KS____, MY_TOGGLE_OS, /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_toggle_os },
+	/* Toggle */
+	/* CTL    ALT     SHIFT   KEYCODE                  CTL     ALT     SHIFT   KEY    FLAG  CALLBACK */
+	{ KS____, KS____, KS____, MY_TOGGLE_OS,   /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_toggle_os },
+	{ KS____, KS____, KS____, MY_TOGGLE_LANG, /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_toggle_lang },
 };
 #undef KS____
 
@@ -498,6 +525,51 @@ static bool process_my_shift(uint16_t keycode, keyrecord_t *record)
 	return false;
 }
 
+static bool process_my_mod(uint16_t keycode, keyrecord_t *record)
+{
+	if (keycode < MY_MOD_1 || keycode > MY_MOD_3)
+		return true;
+
+	uint16_t actual_key = KC_NO;
+
+	switch (keycode) {
+	case MY_MOD_1:
+		actual_key = (flg_os_windows ? KC_LALT : KC_LGUI);
+		break;
+
+	case MY_MOD_2:
+		actual_key = (flg_os_windows ? KC_RALT : KC_RGUI);
+		break;
+
+	case MY_MOD_3:
+		actual_key = (flg_os_windows ? KC_LGUI : KC_RALT);
+		break;
+
+	default:
+		return true;
+	}
+
+	if (record->event.pressed)
+		register_mods(MOD_BIT(actual_key));
+	else
+		unregister_mods(MOD_BIT(actual_key));
+
+	return false;
+}
+
+static bool process_my_special_key(uint16_t keycode, keyrecord_t *record)
+{
+	if (!(keycode == MY_ZENKAKU_HANKAKU && record->event.pressed))
+		return true;
+
+	register_alt_mods();
+	wait_ms(80);
+	tap_code(KC_GRV);
+	unregister_alt_mods();
+
+	return false;
+}
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record)
 {
 	fetch_mods_status();
@@ -506,6 +578,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record)
 		return false;
 
 	if (!process_my_control(keycode, record))
+		return false;
+
+	if (!process_my_mod(keycode, record))
+		return false;
+
+	if (!process_my_special_key(keycode, record))
 		return false;
 	
 	if (!process_translation_key(keycode, record))
