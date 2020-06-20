@@ -216,13 +216,13 @@ static void cb_toggle_custom_key_mode(struct translation *trans)
 static void cb_show_mode(struct translation *trans)
 {
 	uint16_t tmp = unregister_control_mods();
-	send_string("[");
+	send_string("<");
 	send_string(flg_control_custom_key_enabled ? "Cust" : "Dft");
 	send_string(",");
 	send_string(flg_jis_mode ? "JIS" : "US");
 	send_string(",");
 	send_string(flg_os_windows ? "WIN" : "MAC");
-	send_string("]");
+	send_string(">");
 	if (tmp)
 		register_mods(tmp);
 }
@@ -362,8 +362,8 @@ static struct translation TRANSLATION_MAP[] = {
 
 	/* Shortcut key */
 	/* CTL    ALT     SHIFT   KEY            CTL     ALT     SHIFT   KEY    FLAG  CALLBACK */
-	{ KS_ON , KS_ON , KS_OFF, KC_L, /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_win_vdesktop }, /* C-A-l */
-	{ KS_ON , KS_ON , KS_OFF, KC_H, /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_win_vdesktop }, /* C-A-h */
+	{ KS_ON , KS_ON , KS_OFF, KC_L, /* -> */ KS____, KS____, KS____, KC_NO, &flg_control_custom_key_enabled, cb_win_vdesktop }, /* C-A-l */
+	{ KS_ON , KS_ON , KS_OFF, KC_H, /* -> */ KS____, KS____, KS____, KC_NO, &flg_control_custom_key_enabled, cb_win_vdesktop }, /* C-A-h */
 
 	/* Keep screen key */
 	/* CTL    ALT     SHIFT   KEYCODE                   CTL     ALT     SHIFT   KEY    FLAG  CALLBACK */
@@ -371,9 +371,9 @@ static struct translation TRANSLATION_MAP[] = {
 	{ KS_ON , KS_OFF, KS_OFF, MY_KEEP_SCREEEN, /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_toggle_keep_screen_ctrl },
 
 	/* Toggle */
-	/* CTL    ALT     SHIFT   KEYCODE                  CTL     ALT     SHIFT   KEY    FLAG  CALLBACK */
-	{ KS____, KS____, KS____, MY_TOGGLE_OS,   /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_toggle_os },
-	{ KS____, KS____, KS____, MY_TOGGLE_LANG, /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_toggle_lang },
+	/* CTL   ALT     SHIFT  KEYCODE                  CTL     ALT     SHIFT   KEY    FLAG  CALLBACK */
+	{ KS_ON, KS____, KS_ON, MY_TOGGLE_OS,   /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_toggle_os },
+	{ KS_ON, KS____, KS_ON, MY_TOGGLE_LANG, /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_toggle_lang },
 };
 #undef KS____
 
