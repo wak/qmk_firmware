@@ -2,6 +2,9 @@
  * default HHKB Layout
  */
 #include QMK_KEYBOARD_H
+
+#define MIMIC_JIS_KEEP_SCREEN 1
+#define MIMIC_JIS_FN_CONTROL 1
 #include "../../../../../wak_common/keymap.c"
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {

@@ -1,5 +1,8 @@
 #include "keymap_jp.h"
-#include "timer.h"
+
+#ifdef MIMIC_JIS_KEEP_SCREEN
+  #include "timer.h"
+#endif
 
 #define JIS    0
 #define US     2
@@ -142,7 +145,9 @@ struct translation {
 };
 
 static bool flg_control_custom_key_enabled = false;
+#ifdef MIMIC_JIS_FN_CONTROL
 static bool flg_os_windows = true;
+#endif
 static bool flg_jis_mode = true;
 
 static void cb_toggle_custom_key_mode(struct translation *trans)
@@ -157,8 +162,10 @@ static void cb_show_mode(struct translation *trans)
 	send_string(flg_control_custom_key_enabled ? "Cust" : "Dft");
 	send_string(",");
 	send_string(flg_jis_mode ? "JIS" : "US");
+#ifdef MIMIC_JIS_FN_CONTROL
 	send_string(",");
 	send_string(flg_os_windows ? "WIN" : "MAC");
+#endif
 	send_string(">");
 	if (tmp)
 		register_mods(tmp);
@@ -176,6 +183,7 @@ static void cb_win_vdesktop(struct translation *trans)
 		register_mods(tmp);
 }
 
+#ifdef MIMIC_JIS_FN_CONTROL
 void cb_toggle_os(struct translation *trans)
 {
 	flg_os_windows = !flg_os_windows;
@@ -190,7 +198,9 @@ void cb_toggle_lang(struct translation *trans)
 	else
 		layer_move(US);
 }
+#endif
 
+#ifdef MIMIC_JIS_KEEP_SCREEN
 static enum {
 	KEEP_SCREEN_DISABLED,
 	KEEP_SCREEN_MESSAGE,
@@ -260,6 +270,7 @@ void matrix_scan_user(void)
 		}
 	}
 }
+#endif
 
 #define KS____ KS_TRANS
 static struct translation TRANSLATION_MAP[] = {
@@ -302,15 +313,19 @@ static struct translation TRANSLATION_MAP[] = {
 	{ KS_ON , KS_ON , KS_OFF, KC_L, /* -> */ KS____, KS____, KS____, KC_NO, &flg_control_custom_key_enabled, cb_win_vdesktop }, /* C-A-l */
 	{ KS_ON , KS_ON , KS_OFF, KC_H, /* -> */ KS____, KS____, KS____, KC_NO, &flg_control_custom_key_enabled, cb_win_vdesktop }, /* C-A-h */
 
+#ifdef MIMIC_JIS_KEEP_SCREEN
 	/* Keep screen key */
 	/* CTL    ALT     SHIFT   KEYCODE                   CTL     ALT     SHIFT   KEY    FLAG  CALLBACK */
 	{ KS_OFF, KS_OFF, KS_OFF, MY_KEEP_SCREEEN, /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_toggle_keep_screen_message },
 	{ KS_ON , KS_OFF, KS_OFF, MY_KEEP_SCREEEN, /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_toggle_keep_screen_ctrl },
+#endif
 
+#ifdef MIMIC_JIS_FN_CONTROL
 	/* Toggle */
 	/* CTL   ALT     SHIFT  KEYCODE                  CTL     ALT     SHIFT   KEY    FLAG  CALLBACK */
 	{ KS_ON, KS____, KS_ON, MY_TOGGLE_OS,   /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_toggle_os },
 	{ KS_ON, KS____, KS_ON, MY_TOGGLE_LANG, /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_toggle_lang },
+#endif
 };
 #undef KS____
 
@@ -462,6 +477,7 @@ static bool process_my_shift(uint16_t keycode, keyrecord_t *record)
 	return false;
 }
 
+#ifdef MIMIC_JIS_FN_CONTROL
 static bool process_my_mod(uint16_t keycode, keyrecord_t *record)
 {
 	if (keycode < MY_MOD_1 || keycode > MY_MOD_3)
@@ -493,6 +509,7 @@ static bool process_my_mod(uint16_t keycode, keyrecord_t *record)
 
 	return false;
 }
+#endif
 
 static bool process_my_special_key(uint16_t keycode, keyrecord_t *record)
 {
@@ -517,8 +534,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record)
 	if (!process_my_control(keycode, record))
 		return false;
 
+#ifdef MIMIC_JIS_FN_CONTROL
 	if (!process_my_mod(keycode, record))
 		return false;
+#endif
 
 	if (!process_my_special_key(keycode, record))
 		return false;
