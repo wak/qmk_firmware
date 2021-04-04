@@ -1,6 +1,6 @@
 #include "keymap_jp.h"
 
-#ifdef MIMIC_JIS_KEEP_SCREEN
+#ifdef MIMIC_JIS_KEEP_SCREEN_ENABLE
   #include "timer.h"
 #endif
 
@@ -145,7 +145,7 @@ struct translation {
 };
 
 static bool flg_control_custom_key_enabled = false;
-#ifdef MIMIC_JIS_FN_CONTROL
+#ifdef MIMIC_JIS_NATIVE_FN_ENABLE
 static bool flg_os_windows = true;
 #endif
 static bool flg_jis_mode = true;
@@ -162,7 +162,7 @@ static void cb_show_mode(struct translation *trans)
 	send_string(flg_control_custom_key_enabled ? "Cust" : "Dft");
 	send_string(",");
 	send_string(flg_jis_mode ? "JIS" : "US");
-#ifdef MIMIC_JIS_FN_CONTROL
+#ifdef MIMIC_JIS_NATIVE_FN_ENABLE
 	send_string(",");
 	send_string(flg_os_windows ? "WIN" : "MAC");
 #endif
@@ -183,7 +183,7 @@ static void cb_win_vdesktop(struct translation *trans)
 		register_mods(tmp);
 }
 
-#ifdef MIMIC_JIS_FN_CONTROL
+#ifdef MIMIC_JIS_NATIVE_FN_ENABLE
 void cb_toggle_os(struct translation *trans)
 {
 	flg_os_windows = !flg_os_windows;
@@ -200,7 +200,7 @@ void cb_toggle_lang(struct translation *trans)
 }
 #endif
 
-#ifdef MIMIC_JIS_KEEP_SCREEN
+#ifdef MIMIC_JIS_KEEP_SCREEN_ENABLE
 static enum {
 	KEEP_SCREEN_DISABLED,
 	KEEP_SCREEN_MESSAGE,
@@ -313,14 +313,14 @@ static struct translation TRANSLATION_MAP[] = {
 	{ KS_ON , KS_ON , KS_OFF, KC_L, /* -> */ KS____, KS____, KS____, KC_NO, &flg_control_custom_key_enabled, cb_win_vdesktop }, /* C-A-l */
 	{ KS_ON , KS_ON , KS_OFF, KC_H, /* -> */ KS____, KS____, KS____, KC_NO, &flg_control_custom_key_enabled, cb_win_vdesktop }, /* C-A-h */
 
-#ifdef MIMIC_JIS_KEEP_SCREEN
+#ifdef MIMIC_JIS_KEEP_SCREEN_ENABLE
 	/* Keep screen key */
 	/* CTL    ALT     SHIFT   KEYCODE                   CTL     ALT     SHIFT   KEY    FLAG  CALLBACK */
 	{ KS_OFF, KS_OFF, KS_OFF, MY_KEEP_SCREEEN, /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_toggle_keep_screen_message },
 	{ KS_ON , KS_OFF, KS_OFF, MY_KEEP_SCREEEN, /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_toggle_keep_screen_ctrl },
 #endif
 
-#ifdef MIMIC_JIS_FN_CONTROL
+#ifdef MIMIC_JIS_NATIVE_FN_ENABLE
 	/* Toggle */
 	/* CTL   ALT     SHIFT  KEYCODE                  CTL     ALT     SHIFT   KEY    FLAG  CALLBACK */
 	{ KS_ON, KS____, KS_ON, MY_TOGGLE_OS,   /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_toggle_os },
@@ -455,22 +455,22 @@ static bool process_translation_key(uint16_t keycode, keyrecord_t *record)
 
 static bool process_my_control(uint16_t keycode, keyrecord_t *record)
 {
-#ifdef MIMIC_JIS_ENABLE_CONTROL_ZKHK
+#ifdef MIMIC_JIS_CONTROL_ZKHK_ENABLE
 	static bool some_key_pushed;
 #endif
 
 	if (keycode != MY_CONTROL) {
-#ifdef MIMIC_JIS_ENABLE_CONTROL_ZKHK
+#ifdef MIMIC_JIS_CONTROL_ZKHK_ENABLE
 		some_key_pushed = true;
+#endif
 		return true;
 	}
-#endif
 
 	my_control = record->event.pressed;
 	reset_translation_key();
 	reset_my_control_mods();
 
-#ifdef MIMIC_JIS_ENABLE_CONTROL_ZKHK
+#ifdef MIMIC_JIS_CONTROL_ZKHK_ENABLE
 	if (my_control && !has_anykey(keyboard_report)) {
 		some_key_pushed = false;
 	} else {
@@ -495,7 +495,7 @@ static bool process_my_shift(uint16_t keycode, keyrecord_t *record)
 	return false;
 }
 
-#ifdef MIMIC_JIS_FN_CONTROL
+#ifdef MIMIC_JIS_NATIVE_FN_ENABLE
 static bool process_my_mod(uint16_t keycode, keyrecord_t *record)
 {
 	if (keycode < MY_MOD_1 || keycode > MY_MOD_3)
@@ -552,7 +552,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record)
 	if (!process_my_shift(keycode, record))
 		return false;
 
-#ifdef MIMIC_JIS_FN_CONTROL
+#ifdef MIMIC_JIS_NATIVE_FN_ENABLE
 	if (!process_my_mod(keycode, record))
 		return false;
 #endif

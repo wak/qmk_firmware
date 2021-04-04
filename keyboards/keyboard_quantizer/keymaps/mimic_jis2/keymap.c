@@ -15,8 +15,7 @@
  */
 #include QMK_KEYBOARD_H
 #include "keymap_jp.h"
-#define MIMIC_JIS_KEEP_SCREEN 1
-#define MIMIC_JIS_ENABLE_CONTROL_ZKHK 1
+#define MIMIC_JIS_CONTROL_ZKHK_ENABLE 1
 #include "../../../../mimic_jis2/keymap.c"
 
 // Defines names for use in layer keycodes and the keymap

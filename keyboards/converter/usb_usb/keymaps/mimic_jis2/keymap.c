@@ -16,6 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include QMK_KEYBOARD_H
+#define MIMIC_JIS_CONTROL_ZKHK_ENABLE 1
 #include "../../../../../mimic_jis2/keymap.c"
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {

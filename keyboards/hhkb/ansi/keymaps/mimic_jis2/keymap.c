@@ -3,8 +3,8 @@
  */
 #include QMK_KEYBOARD_H
 
-#define MIMIC_JIS_KEEP_SCREEN 1
-#define MIMIC_JIS_FN_CONTROL 1
+#define MIMIC_JIS_KEEP_SCREEN_ENABLE 1
+#define MIMIC_JIS_NATIVE_FN_ENABLE 1
 #include "../../../../../mimic_jis2/keymap.c"
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
