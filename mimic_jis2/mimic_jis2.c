@@ -189,14 +189,14 @@ static void cb_win_vdesktop(struct translation *trans)
 }
 
 #ifdef MIMIC_JIS_OS_WIN_MAC_TOGGLE_ENABLE
-void cb_toggle_os_win_mac(struct translation *trans)
+static void cb_toggle_os_win_mac(struct translation *trans)
 {
 	flg_os_windows = !flg_os_windows;
 }
 #endif
 
 #ifdef MIMIC_JIS_LAYOUT_JIS_US_TOGGLE_ENABLE
-void cb_toggle_layout_jis_us(struct translation *trans)
+static void cb_toggle_layout_jis_us(struct translation *trans)
 {
 	flg_jis_mode = !flg_jis_mode;
 
@@ -216,7 +216,7 @@ static enum {
 static const char keep_screen_message[] = "This message is keeping screen.";
 static int keep_screen_pos = 0;
 
-void cb_toggle_keep_screen_message(struct translation *trans)
+static void cb_toggle_keep_screen_message(struct translation *trans)
 {
 	if (keep_screen_mode == KEEP_SCREEN_MESSAGE) {
 		keep_screen_mode = KEEP_SCREEN_DISABLED;
@@ -227,7 +227,7 @@ void cb_toggle_keep_screen_message(struct translation *trans)
 	send_string("]KM\\");
 }
 
-void cb_toggle_keep_screen_ctrl(struct translation *trans)
+static void cb_toggle_keep_screen_ctrl(struct translation *trans)
 {
 	if (keep_screen_mode == KEEP_SCREEN_CONTROL) {
 		keep_screen_mode = KEEP_SCREEN_DISABLED;
