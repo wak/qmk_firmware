@@ -5,7 +5,7 @@
 
 #define MIMIC_JIS_KEEP_SCREEN 1
 #define MIMIC_JIS_FN_CONTROL 1
-#include "../../../../../wak_common/keymap.c"
+#include "../../../../../mimic_jis2/keymap.c"
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /* BASE Level: Default Layer
