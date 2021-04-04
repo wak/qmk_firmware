@@ -455,13 +455,31 @@ static bool process_translation_key(uint16_t keycode, keyrecord_t *record)
 
 static bool process_my_control(uint16_t keycode, keyrecord_t *record)
 {
-	if (keycode != MY_CONTROL)
+#ifdef MIMIC_JIS_ENABLE_CONTROL_ZKHK
+	static bool some_key_pushed;
+#endif
+
+	if (keycode != MY_CONTROL) {
+#ifdef MIMIC_JIS_ENABLE_CONTROL_ZKHK
+		some_key_pushed = true;
 		return true;
+	}
+#endif
 
 	my_control = record->event.pressed;
 	reset_translation_key();
 	reset_my_control_mods();
 
+#ifdef MIMIC_JIS_ENABLE_CONTROL_ZKHK
+	if (my_control) {
+		some_key_pushed = false;
+	} else {
+		/* Controlキーをタップした場合 */
+		if (!some_key_pushed && !mod_shift && !mod_alt & !mod_gui) {
+			tap_code(KC_ZKHK);
+		}
+	}
+#endif
 	return false;
 }
 
@@ -528,10 +546,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record)
 {
 	fetch_mods_status();
 
-	if (!process_my_shift(keycode, record))
+	if (!process_my_control(keycode, record))
 		return false;
 
-	if (!process_my_control(keycode, record))
+	if (!process_my_shift(keycode, record))
 		return false;
 
 #ifdef MIMIC_JIS_FN_CONTROL
