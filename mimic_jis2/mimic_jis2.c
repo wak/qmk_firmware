@@ -163,8 +163,8 @@ static void cb_show_mode(struct translation *trans)
 	uint16_t tmp = unregister_control_mods();
 	send_string("<");
 	send_string(flg_control_custom_key_enabled ? "Cust" : "Dft");
-	send_string(",");
 #ifdef MIMIC_JIS_LAYOUT_JIS_US_TOGGLE_ENABLE
+	send_string(",");
 	send_string(flg_jis_mode ? "JIS" : "US");
 #endif
 #ifdef MIMIC_JIS_OS_WIN_MAC_TOGGLE_ENABLE
