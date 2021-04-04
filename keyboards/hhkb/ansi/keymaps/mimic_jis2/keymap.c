@@ -7,7 +7,7 @@
 #define MIMIC_JIS_OS_WIN_MAC_TOGGLE_ENABLE 1
 #define MIMIC_JIS_LAYOUT_JIS_US_TOGGLE_ENABLE 1
 
-#include "../../../../../mimic_jis2/keymap.c"
+#include "../../../../../mimic_jis2/mimic_jis2.c"
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /* BASE Level: Default Layer
