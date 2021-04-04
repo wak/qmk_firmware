@@ -471,7 +471,7 @@ static bool process_my_control(uint16_t keycode, keyrecord_t *record)
 	reset_my_control_mods();
 
 #ifdef MIMIC_JIS_ENABLE_CONTROL_ZKHK
-	if (my_control) {
+	if (my_control && !has_anykey(keyboard_report)) {
 		some_key_pushed = false;
 	} else {
 		/* Controlキーをタップした場合 */
