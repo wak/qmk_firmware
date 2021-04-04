@@ -145,10 +145,13 @@ struct translation {
 };
 
 static bool flg_control_custom_key_enabled = false;
-#ifdef MIMIC_JIS_NATIVE_FN_ENABLE
+
+#ifdef MIMIC_JIS_OS_WIN_MAC_TOGGLE_ENABLE
 static bool flg_os_windows = true;
 #endif
+
 static bool flg_jis_mode = true;
+
 
 static void cb_toggle_custom_key_mode(struct translation *trans)
 {
@@ -161,8 +164,10 @@ static void cb_show_mode(struct translation *trans)
 	send_string("<");
 	send_string(flg_control_custom_key_enabled ? "Cust" : "Dft");
 	send_string(",");
+#ifdef MIMIC_JIS_LAYOUT_JIS_US_TOGGLE_ENABLE
 	send_string(flg_jis_mode ? "JIS" : "US");
-#ifdef MIMIC_JIS_NATIVE_FN_ENABLE
+#endif
+#ifdef MIMIC_JIS_OS_WIN_MAC_TOGGLE_ENABLE
 	send_string(",");
 	send_string(flg_os_windows ? "WIN" : "MAC");
 #endif
@@ -183,13 +188,15 @@ static void cb_win_vdesktop(struct translation *trans)
 		register_mods(tmp);
 }
 
-#ifdef MIMIC_JIS_NATIVE_FN_ENABLE
-void cb_toggle_os(struct translation *trans)
+#ifdef MIMIC_JIS_OS_WIN_MAC_TOGGLE_ENABLE
+void cb_toggle_os_win_mac(struct translation *trans)
 {
 	flg_os_windows = !flg_os_windows;
 }
+#endif
 
-void cb_toggle_lang(struct translation *trans)
+#ifdef MIMIC_JIS_LAYOUT_JIS_US_TOGGLE_ENABLE
+void cb_toggle_layout_jis_us(struct translation *trans)
 {
 	flg_jis_mode = !flg_jis_mode;
 
@@ -320,11 +327,13 @@ static struct translation TRANSLATION_MAP[] = {
 	{ KS_ON , KS_OFF, KS_OFF, MY_KEEP_SCREEEN, /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_toggle_keep_screen_ctrl },
 #endif
 
-#ifdef MIMIC_JIS_NATIVE_FN_ENABLE
 	/* Toggle */
 	/* CTL   ALT     SHIFT  KEYCODE                  CTL     ALT     SHIFT   KEY    FLAG  CALLBACK */
-	{ KS_ON, KS____, KS_ON, MY_TOGGLE_OS,   /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_toggle_os },
-	{ KS_ON, KS____, KS_ON, MY_TOGGLE_LANG, /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_toggle_lang },
+#ifdef MIMIC_JIS_OS_WIN_MAC_TOGGLE_ENABLE
+	{ KS_ON, KS____, KS_ON, MY_TOGGLE_OS,   /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_toggle_os_win_mac },
+#endif
+#ifdef MIMIC_JIS_LAYOUT_JIS_US_TOGGLE_ENABLE
+	{ KS_ON, KS____, KS_ON, MY_TOGGLE_LANG, /* -> */ KS____, KS____, KS____, KC_NO, NULL, cb_toggle_layout_jis_us },
 #endif
 };
 #undef KS____
