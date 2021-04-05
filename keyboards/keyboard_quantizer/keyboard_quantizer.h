@@ -79,7 +79,7 @@ lctrl, lgui, lalt, mhen, spc, henk, kana, ralt, rgui, app, rctrl,        left, d
     { u, v, w, x, y, z, k1, k2}, \
     { k3, k4, k5, k6, k7, k8, k9, k0}, \
     {ent, esc, bspc, tab, spc, min, circ, at}, \
-    {lbrc, KC_BSLASH, rbrc, scln, cln, hanzen, comm, dot}, \
+    {lbrc, yen, rbrc, scln, cln, hanzen, comm, dot}, \
     {slsh, caps, f1, f2, f3, f4, f5, f6}, \
     {f7, f8, f9, f10, f11, f12, pscr, scrl}, \
     {pause, ins, home, pageup, del, end, pagedown, right}, \
