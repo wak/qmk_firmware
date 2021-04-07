@@ -287,8 +287,15 @@ static struct translation TRANSLATION_MAP[] = {
 	{ KS____, KS____, KS_ON , MY_EQL_PLUS  , /* -> */ KS____, KS____, KS_ON , JP_SCLN, &flg_jis_mode }, /* + */
 	{ KS____, KS____, KS_OFF, MY_MIN_USCRE , /* -> */ KS____, KS____, KS_OFF, JP_MINS, &flg_jis_mode }, /* - */
 	{ KS____, KS____, KS_ON , MY_MIN_USCRE , /* -> */ KS____, KS____, KS_ON , JP_BSLS, &flg_jis_mode }, /* _ */
+#ifdef MIMIC_JIS_TILDE_TO_ZKHK_ENABLE
+	{ KS____, KS____, KS_OFF, KC_CAPS      , /* -> */ KS____, KS____, KS_ON , JP_AT  , &flg_jis_mode }, /* ` */
+	{ KS____, KS____, KS_ON , KC_CAPS      , /* -> */ KS____, KS____, KS_ON , JP_CIRC, &flg_jis_mode }, /* ~ */
+	{ KS____, KS____, KS____, KC_APP       , /* -> */ KS____, KS____, KS____, KC_CAPS, &flg_jis_mode },
+	{ KS____, KS____, KS____, MY_TILD_BQUOT, /* -> */ KS____, KS____, KS____, KC_ZKHK, &flg_jis_mode },
+#else
 	{ KS____, KS____, KS_OFF, MY_TILD_BQUOT, /* -> */ KS____, KS____, KS_ON , JP_AT  , &flg_jis_mode }, /* ` */
 	{ KS____, KS____, KS_ON , MY_TILD_BQUOT, /* -> */ KS____, KS____, KS_ON , JP_CIRC, &flg_jis_mode }, /* ~ */
+#endif
 	{ KS____, KS____, KS_OFF, MY_QUOT_DQUOT, /* -> */ KS____, KS____, KS_ON , KC_7   , &flg_jis_mode }, /* ' */
 	{ KS____, KS____, KS_ON , MY_QUOT_DQUOT, /* -> */ KS____, KS____, KS_ON , KC_2   , &flg_jis_mode }, /* " */
 	{ KS____, KS____, KS_ON , KC_2         , /* -> */ KS____, KS____, KS_OFF, JP_AT  , &flg_jis_mode }, /* @ */
