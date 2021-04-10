@@ -144,7 +144,9 @@ struct translation {
 	void (*callback)(struct translation *);
 };
 
+#ifdef MIMIC_JIS_MY_CUSTOM_FEATURE_ENABLE
 static bool flg_control_custom_key_enabled = false;
+#endif
 
 #ifdef MIMIC_JIS_OS_WIN_MAC_TOGGLE_ENABLE
 static bool flg_os_windows = true;
@@ -152,12 +154,14 @@ static bool flg_os_windows = true;
 
 static bool flg_jis_mode = true;
 
-
+#ifdef MIMIC_JIS_MY_CUSTOM_FEATURE_ENABLE
 static void cb_toggle_custom_key_mode(struct translation *trans)
 {
 	flg_control_custom_key_enabled = !flg_control_custom_key_enabled;
 }
+#endif
 
+#ifdef MIMIC_JIS_MY_CUSTOM_FEATURE_ENABLE
 static void cb_show_mode(struct translation *trans)
 {
 	uint16_t tmp = unregister_control_mods();
@@ -175,7 +179,9 @@ static void cb_show_mode(struct translation *trans)
 	if (tmp)
 		register_mods(tmp);
 }
+#endif
 
+#ifdef MIMIC_JIS_MY_CUSTOM_FEATURE_ENABLE
 static void cb_win_vdesktop(struct translation *trans)
 {
 	uint16_t tmp = unregister_alt_mods();
@@ -187,6 +193,7 @@ static void cb_win_vdesktop(struct translation *trans)
 	if (tmp)
 		register_mods(tmp);
 }
+#endif
 
 #ifdef MIMIC_JIS_OS_WIN_MAC_TOGGLE_ENABLE
 static void cb_toggle_os_win_mac(struct translation *trans)
@@ -306,6 +313,7 @@ static struct translation TRANSLATION_MAP[] = {
 	{ KS____, KS____, KS_ON , KC_0         , /* -> */ KS____, KS____, KS_ON , KC_9   , &flg_jis_mode }, /* ) */
 	{ KS____, KS____, KS_ON , KC_SCLN      , /* -> */ KS____, KS____, KS_OFF, JP_COLN, &flg_jis_mode }, /* : */
 
+#ifdef MIMIC_JIS_MY_CUSTOM_FEATURE_ENABLE
 	/* Custom key */
 	/* CTL    ALT     SHIFT   KEYCODE          CTL     ALT     SHIFT   KEYCODE   FLAG  CALLBACK */
 	{ KS_ON , KS____, KS_OFF, KC_ESC,          KS____, KS____, KS____, KC_NO   , NULL, cb_toggle_custom_key_mode }, /* C-ESC              */
@@ -326,6 +334,7 @@ static struct translation TRANSLATION_MAP[] = {
 	/* CTL    ALT     SHIFT   KEY            CTL     ALT     SHIFT   KEY    FLAG  CALLBACK */
 	{ KS_ON , KS_ON , KS_OFF, KC_L, /* -> */ KS____, KS____, KS____, KC_NO, &flg_control_custom_key_enabled, cb_win_vdesktop }, /* C-A-l */
 	{ KS_ON , KS_ON , KS_OFF, KC_H, /* -> */ KS____, KS____, KS____, KC_NO, &flg_control_custom_key_enabled, cb_win_vdesktop }, /* C-A-h */
+#endif
 
 #ifdef MIMIC_JIS_KEEP_SCREEN_ENABLE
 	/* Keep screen key */
