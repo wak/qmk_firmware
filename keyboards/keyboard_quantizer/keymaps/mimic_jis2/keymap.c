@@ -19,6 +19,7 @@
 #define MIMIC_JIS_KEEP_SCREEN_ENABLE 1
 #define MIMIC_JIS_CONTROL_ZKHK_ENABLE 1
 #define MIMIC_JIS_TILDE_TO_ZKHK_ENABLE 1
+#define MIMIC_JIS_MY_CUSTOM_FEATURE_ENABLE 1
 #include "../../../../mimic_jis2/mimic_jis2.c"
 
 // Defines names for use in layer keycodes and the keymap
