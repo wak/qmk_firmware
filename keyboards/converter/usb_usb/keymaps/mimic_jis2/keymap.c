@@ -17,7 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include QMK_KEYBOARD_H
 #define MIMIC_JIS_KEEP_SCREEN_ENABLE 1
-#define MIMIC_JIS_CONTROL_ZKHK_ENABLE 1
 #define MIMIC_JIS_MY_CUSTOM_FEATURE_ENABLE 1
 #include "../../../../../mimic_jis2/mimic_jis2.c"
 

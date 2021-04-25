@@ -480,14 +480,7 @@ static bool process_translation_key(uint16_t keycode, keyrecord_t *record)
 
 static bool process_my_control(uint16_t keycode, keyrecord_t *record)
 {
-#ifdef MIMIC_JIS_CONTROL_ZKHK_ENABLE
-	static bool some_key_pushed;
-#endif
-
 	if (keycode != MY_CONTROL) {
-#ifdef MIMIC_JIS_CONTROL_ZKHK_ENABLE
-		some_key_pushed = true;
-#endif
 		return true;
 	}
 
@@ -495,16 +488,6 @@ static bool process_my_control(uint16_t keycode, keyrecord_t *record)
 	reset_translation_key();
 	reset_my_control_mods();
 
-#ifdef MIMIC_JIS_CONTROL_ZKHK_ENABLE
-	if (my_control && !has_anykey(keyboard_report)) {
-		some_key_pushed = false;
-	} else {
-		/* Controlキーをタップした場合 */
-		if (!some_key_pushed && !mod_shift && !mod_alt & !mod_gui) {
-			tap_code(KC_ZKHK);
-		}
-	}
-#endif
 	return false;
 }
 
